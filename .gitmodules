@@ -1,0 +1,3 @@
+[submodule "AquaLibrary"]
+	path = AquaLibrary
+	url = https://github.com/dummycount/PSO2-Aqua-Library.git
