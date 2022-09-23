@@ -17,7 +17,7 @@ New-Item -ItemType Directory -Force -Path $rootPackages | Out-Null
 New-Junction -Path $aquaPackages -Target $rootPackages
 
 # Link FBX dependencies into AquaModelLibrary.Native
-$fbxTarget = 'C:\Program Files\Autodesk\FBX\FBX SDK\2020.0.1'
+$fbxTarget = 'C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.2'
 $fbxPath = Join-Path $PSScriptRoot 'AquaLibrary\AquaModelLibrary.Native\Dependencies\FBX'
 
 New-Junction -Path "$fbxPath/lib" -Target "$fbxTarget/lib"
