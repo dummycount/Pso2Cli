@@ -19,8 +19,38 @@ namespace Pso2Cli
 			using (var image = Pfimage.FromFile(ddsFile.FullName))
 			{
 				var data = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
-				var bitmap = new Bitmap(image.Width, image.Height, image.Stride, PixelFormat.Format32bppArgb, data);
+
+				var bitmap = new Bitmap(image.Width, image.Height, image.Stride, GetPixelFormat(image), data);
+				UpdateColorPalette(bitmap);
+
 				bitmap.Save(pngFile.FullName, ImageFormat.Png);
+			}
+		}
+
+		private static PixelFormat GetPixelFormat(IImage image)
+		{
+			switch (image.Format)
+			{
+				case Pfim.ImageFormat.Rgb8:
+					return PixelFormat.Format8bppIndexed;
+
+				default:
+					return PixelFormat.Format32bppArgb;
+			}
+		}
+
+		private static void UpdateColorPalette(Bitmap bitmap)
+		{
+			switch (bitmap.PixelFormat)
+			{
+				case PixelFormat.Format8bppIndexed:
+					var palette = bitmap.Palette;
+					for (var i = 0; i < palette.Entries.Length; i++)
+					{
+						palette.Entries[i] = Color.FromArgb(i, i, i);
+					}
+					bitmap.Palette = palette;
+					break;
 			}
 		}
 	}
