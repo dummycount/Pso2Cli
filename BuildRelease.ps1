@@ -3,7 +3,7 @@ $vs = ConvertFrom-Json $(&'C:\Program Files (x86)\Microsoft Visual Studio\Instal
 $msBuild = Join-Path $vs.installationPath 'Msbuild/Current/Bin/MSBuild.exe'
 
 & "$PSScriptRoot/LinkDependencies.ps1"
-& $msBuild "$PSScriptRoot/Pso2Cli.sln" -p:RestorePackagesConfig=true -p:Configuration=Release -verbosity:minimal -restore
+& $msBuild "$PSScriptRoot/Pso2Cli.sln" -p:RestorePackagesConfig=true -p:Configuration=Release -verbosity:minimal -restore -t:Rebuild
 
 if (!$?) {
     exit
