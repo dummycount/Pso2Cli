@@ -18,13 +18,20 @@ namespace Pso2Cli
 
 		public static Parser GetParser(Command rootCommand)
 		{
+#if !DEBUG
 			const int ErrorExitCode = 1;
-
+#endif
 			return new CommandLineBuilder(rootCommand)
-				.UseDefaults()
 				.UseVersionOption()
-				.UseTypoCorrections()
 				.UseHelp()
+				.UseEnvironmentVariableDirective()
+				.UseParseDirective()
+				.UseSuggestDirective()
+				.RegisterWithDotnetSuggest()
+				.UseTypoCorrections()
+				.UseParseErrorReporting()
+				.CancelOnProcessTermination()
+#if !DEBUG
 				.UseExceptionHandler((exception, context) =>
 				{
 					if (exception is OperationCanceledException)
@@ -45,6 +52,7 @@ namespace Pso2Cli
 						Console.ResetColor();
 					}
 				}, ErrorExitCode)
+#endif
 				.Build();
 		}
 	}
