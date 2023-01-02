@@ -68,7 +68,7 @@ namespace Pso2Cli
 			var group1Result = UnpackGroup(archive.groupOneFiles, group1);
 			var group2Result = UnpackGroup(archive.groupTwoFiles, group2);
 
-			var exportedFiles = Utility.Chain(group1Result, group2Result);
+			var exportedFiles = Utility.Chain(group1Result, group2Result).ToList();
 
 			if (exportFbx)
 			{
