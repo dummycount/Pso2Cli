@@ -18,9 +18,6 @@ namespace Pso2Cli
 
 		public static Parser GetParser(Command rootCommand)
 		{
-#if !DEBUG
-			const int ErrorExitCode = 1;
-#endif
 			return new CommandLineBuilder(rootCommand)
 				.UseVersionOption()
 				.UseHelp()
@@ -32,26 +29,7 @@ namespace Pso2Cli
 				.UseParseErrorReporting()
 				.CancelOnProcessTermination()
 #if !DEBUG
-				.UseExceptionHandler((exception, context) =>
-				{
-					if (exception is OperationCanceledException)
-					{
-						return;
-					}
-
-					if (!Console.IsOutputRedirected)
-					{
-						Console.ForegroundColor = ConsoleColor.Red;
-					}
-
-					context.Console.Error.Write(context.LocalizationResources.ExceptionHandlerHeader());
-					context.Console.Error.WriteLine(exception.Message);
-
-					if (!Console.IsOutputRedirected)
-					{
-						Console.ResetColor();
-					}
-				}, ErrorExitCode)
+				.UseExceptionHandler()
 #endif
 				.Build();
 		}

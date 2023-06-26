@@ -13,12 +13,10 @@ if (!$?) {
 $out = "$PSScriptRoot/Release/Pso2Cli"
 New-Item -ItemType Directory -Force -Path $out | Out-Null
 
-Remove-Item "$out/*"
+Remove-Item "$out/*" -Recurse -Force
 
-Copy-Item -Path "$PSScriptRoot/Aqp2Fbx/bin/Release/*" -Destination $out -Recurse
-Copy-Item -Path "$PSScriptRoot/Dds2Png/bin/Release/*" -Destination $out -Recurse
-Copy-Item -Path "$PSScriptRoot/Fbx2Aqp/bin/Release/*" -Destination $out -Recurse
-Copy-Item -Path "$PSScriptRoot/IceCli/bin/Release/*" -Destination $out -Recurse
+Copy-Item -Path "$PSScriptRoot/Cli/bin/Release/*" -Destination $out -Recurse -Force
+Copy-Item -Path "$PSScriptRoot/IceCli/bin/Release/*" -Destination $out -Recurse -Force
 
 # Remove empty directories
 foreach ($subdir in Get-ChildItem $out -Directory) {

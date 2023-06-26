@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -80,7 +81,7 @@ namespace Pso2Cli
 				model.splitVSETPerMesh();
 			}
 
-			FbxExporter.ExportToFile(model, aqua.aquaBones.First(), aqms, fbxFile.FullName, aqmNames, includeMetadata);
+			FbxExporter.ExportToFile(model, aqua.aquaBones.First(), aqms, fbxFile.FullName, aqmNames, new List<Matrix4x4>(), includeMetadata);
 		}
 
 		/// <summary>
