@@ -1,4 +1,5 @@
-﻿using AquaModelLibrary.Extra;
+﻿using AquaModelLibrary;
+using AquaModelLibrary.Extra;
 using LegacyObj;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Pso2Cli
@@ -32,6 +34,8 @@ namespace Pso2Cli
 
 			var metaArg = new Option<bool>("--no-metadata", description: "Do not include metadata in the exported model");
 
+			var infoArg = new Option<bool>(new string[] { "--info", "-i" }, description: "Print model information (JSON format)");
+
 			var command = new Command(name: "fbx", description: "Convert models to FBX format. Supported formats: .aqp")
 			{
 				inputArg,
@@ -39,14 +43,15 @@ namespace Pso2Cli
 				skeletonArg,
 				motionArg,
 				metaArg,
+				infoArg,
 			};
 
-			command.SetHandler(Convert, inputArg, destArg, skeletonArg, motionArg, metaArg);
+			command.SetHandler(Convert, inputArg, destArg, skeletonArg, motionArg, metaArg, infoArg);
 
 			return command;
 		}
 
-		private static void Convert(FileInfo inputFile, FileInfo destFile, FileInfo skeletonFile, FileInfo[] motionFiles, bool noMetadata)
+		private static void Convert(FileInfo inputFile, FileInfo destFile, FileInfo skeletonFile, FileInfo[] motionFiles, bool noMetadata, bool printInfo)
 		{
 			destFile = destFile ?? new FileInfo(Path.ChangeExtension(inputFile.FullName, ".fbx"));
 			skeletonFile = skeletonFile ?? new FileInfo(Path.ChangeExtension(inputFile.FullName, ".aqn"));
@@ -56,18 +61,29 @@ namespace Pso2Cli
 			{
 				case ".aqp":
 					Directory.CreateDirectory(destFile.DirectoryName);
-					Fbx.ConvertFromAqua(
+					var aqua = Fbx.ConvertFromAqua(
 						fbxFile: destFile,
 						modelFile: inputFile,
 						skeletonFile: skeletonFile,
 						motionFiles: motionFiles,
 						includeMetadata: !noMetadata);
+					if (printInfo)
+					{
+						PrintModelInfo(aqua);
+					}
 					break;
 
 				default:
 					throw new ArgumentException($"Unsupported format: {format}");
 			}
 
+		}	
+
+		private static void PrintModelInfo(AquaUtil aqua)
+		{
+			var info = new ModelInfo(aqua);
+
+			Console.WriteLine(info.ToString());
 		}
 	}
 }

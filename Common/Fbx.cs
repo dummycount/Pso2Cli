@@ -92,11 +92,11 @@ namespace Pso2Cli
 		/// <param name="skeletonFile">.aqn file to read</param>
 		/// <param name="motionFiles">List of .aqm files to read</param>
 		/// <param name="includeMetadata"></param>
-		public static void ConvertFromAqua(FileInfo fbxFile, FileInfo modelFile, FileInfo skeletonFile = null, bool includeMetadata = true, IEnumerable < FileInfo> motionFiles = null)
+		public static AquaUtil ConvertFromAqua(FileInfo fbxFile, FileInfo modelFile, FileInfo skeletonFile = null, bool includeMetadata = true, IEnumerable < FileInfo> motionFiles = null)
 		{
 			var model = File.ReadAllBytes(modelFile.FullName);
 			var skeleton = skeletonFile != null ? File.ReadAllBytes(skeletonFile.FullName) : null;
-			ConvertFromAqua(fbxFile, model, skeleton, includeMetadata, motionFiles);
+			return ConvertFromAqua(fbxFile, model, skeleton, includeMetadata, motionFiles);
 		}
 
 		/// <summary>
@@ -107,7 +107,7 @@ namespace Pso2Cli
 		/// <param name="skeletonFile">.aqn file to read</param>
 		/// <param name="motionFiles">List of .aqm files to read</param>
 		/// <param name="includeMetadata"></param>
-		public static void ConvertFromAqua(FileInfo fbxFile, byte[] modelFile, byte[] skeletonFile, bool includeMetadata = true, IEnumerable < FileInfo> motionFiles = null)
+		public static AquaUtil ConvertFromAqua(FileInfo fbxFile, byte[] modelFile, byte[] skeletonFile, bool includeMetadata = true, IEnumerable < FileInfo> motionFiles = null)
 		{
 			var aqua = new AquaUtil();
 			var aqms = new List<AquaMotion>();
@@ -123,6 +123,8 @@ namespace Pso2Cli
 			var motions = motionFiles?.Select(f => new MotionExport { Name = f.FullName, Motion = ReadMotion(f) });
 
 			Export(aqua, fbxFile, includeMetadata, motions);
+
+			return aqua;
 		}
 
 		private static AquaMotion ReadMotion(FileInfo file)

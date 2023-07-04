@@ -19,6 +19,7 @@ namespace Cli
 			rootCommand.AddCommand(ConvertToFbx.GetCommand());
 			rootCommand.AddCommand(ConvertToPng.GetCommand());
 			rootCommand.AddCommand(FileLists.GetCommand());
+			rootCommand.AddCommand(InfoCommand.GetCommand());
 
 			var parser = Utility.GetParser(rootCommand);
 			return parser.Invoke(args);
