@@ -15,6 +15,7 @@ namespace Cli
 		{
 			var rootCommand = new RootCommand("PSO2 utilities");
 
+			rootCommand.AddCommand(CmxData.GetCommand());
 			rootCommand.AddCommand(ConvertToAqp.GetCommand());
 			rootCommand.AddCommand(ConvertToFbx.GetCommand());
 			rootCommand.AddCommand(ConvertToPng.GetCommand());

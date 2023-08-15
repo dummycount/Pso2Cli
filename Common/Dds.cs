@@ -27,15 +27,47 @@ namespace Pso2Cli
 			}
 		}
 
+		public static MemoryStream ConvertToPng(Stream stream)
+		{
+			using (var image = Pfimage.FromStream(stream)) 
+			{
+				var data = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
+
+				var bitmap = new Bitmap(image.Width, image.Height, image.Stride, GetPixelFormat(image), data);
+				UpdateColorPalette(bitmap);
+
+				var result = new MemoryStream();
+				bitmap.Save(result, ImageFormat.Png);
+				result.Position = 0;
+
+				return result;
+			}
+		}
+
 		private static PixelFormat GetPixelFormat(IImage image)
 		{
 			switch (image.Format)
 			{
+				case Pfim.ImageFormat.Rgb24:
+					return PixelFormat.Format24bppRgb;
+
+				case Pfim.ImageFormat.Rgba32:
+					return PixelFormat.Format32bppArgb;
+
+				case Pfim.ImageFormat.R5g5b5:
+					return PixelFormat.Format16bppRgb555;
+
+				case Pfim.ImageFormat.R5g6b5:
+					return PixelFormat.Format16bppRgb565;
+
+				case Pfim.ImageFormat.R5g5b5a1:
+					return PixelFormat.Format16bppArgb1555;
+
 				case Pfim.ImageFormat.Rgb8:
 					return PixelFormat.Format8bppIndexed;
 
 				default:
-					return PixelFormat.Format32bppArgb;
+					throw new NotImplementedException($"Unsupported image format: {image.Format}");
 			}
 		}
 

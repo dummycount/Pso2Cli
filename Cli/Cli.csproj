@@ -217,6 +217,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CmxData.cs" />
     <Compile Include="ConvertToFbx.cs" />
     <Compile Include="ConvertToAqp.cs" />
     <Compile Include="ConvertToPng.cs" />
