@@ -21,28 +21,28 @@ namespace Pso2Cli
 			};
 
 			var skeletonArg = new Option<FileInfo>(
-				aliases: ["--skeleton", "-s"], 
+				aliases: ["--skeleton", "-s"],
 				description: ".aqn skeleton for the model [default: <model>.aqn]")
 				.ExistingOnly();
 
 			var motionArg = new Option<FileInfo[]>(
-				aliases: ["--motion", "-m"], 
+				aliases: ["--motion", "-m"],
 				description: ".aqm motion files to include")
 				.ExistingOnly();
 
 			var metaArg = new Option<bool>(
-				name: "--no-metadata", 
+				name: "--no-metadata",
 				description: "Do not include metadata in the exported model");
 
 			var infoArg = new Option<bool>(
-				aliases: ["--info", "-i"], 
+				aliases: ["--info", "-i"],
 				description: "Print model information (JSON format)");
 
 			var command = new Command(name: "fbx", description: "Convert models to FBX")
 			{
 				sourceArg,
-				destArg, 
-				skeletonArg, 
+				destArg,
+				skeletonArg,
 				motionArg,
 				metaArg,
 				infoArg,
@@ -82,7 +82,8 @@ namespace Pso2Cli
 
 		private static void PrintModelInfo(AquaUtil aqua)
 		{
-			throw new NotImplementedException();
+			var info = new ModelInfo(aqua);
+			Console.WriteLine(info.ToString());
 		}
 
 		private static AquaUtil ConvertFromAqp(FileInfo source, FileInfo dest, FileInfo skeleton, FileInfo[] motion, bool includeMetadata)
