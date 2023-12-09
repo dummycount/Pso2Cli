@@ -30,6 +30,7 @@ New-Item "$PSScriptRoot/AquaModelTool/bin/Debug" -ItemType Directory -ErrorActio
 New-Item "$PSScriptRoot/AquaModelTool/bin/Release" -ItemType Directory -ErrorAction SilentlyContinue
 New-Item "$PSScriptRoot/SoulsModelTool/bin/Debug" -ItemType Directory -ErrorAction SilentlyContinue
 New-Item "$PSScriptRoot/SoulsModelTool/bin/Release" -ItemType Directory -ErrorAction SilentlyContinue
+New-Item "$PSScriptRoot/ZamboniLib" -ItemType Directory -ErrorAction SilentlyContinue
 New-Item "$PSScriptRoot/PSO2-Aqua-Library/AquaModelTool/bin/Debug" -ItemType Directory -ErrorAction SilentlyContinue
 New-Item "$PSScriptRoot/PSO2-Aqua-Library/AquaModelTool/bin/Release" -ItemType Directory -ErrorAction SilentlyContinue
 New-Item "$PSScriptRoot/PSO2-Aqua-Library/SoulsModelTool/bin/Debug" -ItemType Directory -ErrorAction SilentlyContinue
