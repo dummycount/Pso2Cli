@@ -26,8 +26,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		SetupDependencies.ps1 = SetupDependencies.ps1
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ooz", "PSO2-Aqua-Library\ZamboniLib\ooz-sys\ooz.vcxproj", "{B6748219-A0E7-46BB-AE38-5343961CB36A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug (x86)|Any CPU = Debug (x86)|Any CPU
@@ -197,36 +195,6 @@ Global
 		{ED5D3E22-804B-4BAA-BD7F-F47F19804CF8}.x86|x64.Build.0 = Debug|Any CPU
 		{ED5D3E22-804B-4BAA-BD7F-F47F19804CF8}.x86|x86.ActiveCfg = Debug|Any CPU
 		{ED5D3E22-804B-4BAA-BD7F-F47F19804CF8}.x86|x86.Build.0 = Debug|Any CPU
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug (x86)|Any CPU.ActiveCfg = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug (x86)|Any CPU.Build.0 = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug (x86)|x64.ActiveCfg = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug (x86)|x64.Build.0 = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug (x86)|x86.ActiveCfg = Debug|Win32
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug (x86)|x86.Build.0 = Debug|Win32
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug|Any CPU.Build.0 = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug|x64.ActiveCfg = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug|x64.Build.0 = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug|x86.ActiveCfg = Debug|Win32
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Debug|x86.Build.0 = Debug|Win32
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release (x86)|Any CPU.ActiveCfg = Release|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release (x86)|Any CPU.Build.0 = Release|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release (x86)|x64.ActiveCfg = Release|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release (x86)|x64.Build.0 = Release|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release (x86)|x86.ActiveCfg = Release|Win32
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release (x86)|x86.Build.0 = Release|Win32
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release|Any CPU.ActiveCfg = Release|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release|Any CPU.Build.0 = Release|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release|x64.ActiveCfg = Release|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release|x64.Build.0 = Release|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release|x86.ActiveCfg = Release|Win32
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.Release|x86.Build.0 = Release|Win32
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.x86|Any CPU.ActiveCfg = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.x86|Any CPU.Build.0 = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.x86|x64.ActiveCfg = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.x86|x64.Build.0 = Debug|x64
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.x86|x86.ActiveCfg = Debug|Win32
-		{B6748219-A0E7-46BB-AE38-5343961CB36A}.x86|x86.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
