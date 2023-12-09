@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Pso2Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "cmx body"
+    }
+  }
+}
