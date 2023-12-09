@@ -17,8 +17,8 @@ $fbxTarget = 'C:\Program Files\Autodesk\FBX\FBX SDK\2020.1'
 $fbxPath = Join-Path $PSScriptRoot 'PSO2-Aqua-Library\AquaModelLibrary.Native\Dependencies\FBX'
 
 if (!(Test-Path $fbxTarget)) {
-    Write-Output "Could not find FBX SDK. Install from:"
-    Write-Output "https://www.autodesk.com/content/dam/autodesk/www/adn/fbx/2020-1/fbx20201_fbxsdk_vs2017_win.exe"
+    Write-Output 'Could not find FBX SDK. Install from:'
+    Write-Output 'https://www.autodesk.com/content/dam/autodesk/www/adn/fbx/2020-1/fbx20201_fbxsdk_vs2017_win.exe'
     exit 1
 }
 
@@ -26,14 +26,14 @@ New-Junction -Path "$fbxPath/lib" -Target "$fbxTarget/lib"
 New-Junction -Path "$fbxPath/include" -Target "$fbxTarget/include"
 
 # Silence meaningless errors from PSO2-Aqua-Library build
-New-Item AquaModelTool/bin/Debug -ItemType Directory -ErrorAction SilentlyContinue
-New-Item AquaModelTool/bin/Release -ItemType Directory -ErrorAction SilentlyContinue
-New-Item SoulsModelTool/bin/Debug -ItemType Directory -ErrorAction SilentlyContinue
-New-Item SoulsModelTool/bin/Release -ItemType Directory -ErrorAction SilentlyContinue
-New-Item PSO2-Aqua-Library/AquaModelTool/bin/Debug -ItemType Directory -ErrorAction SilentlyContinue
-New-Item PSO2-Aqua-Library/AquaModelTool/bin/Release -ItemType Directory -ErrorAction SilentlyContinue
-New-Item PSO2-Aqua-Library/SoulsModelTool/bin/Debug -ItemType Directory -ErrorAction SilentlyContinue
-New-Item PSO2-Aqua-Library/SoulsModelTool/bin/Release -ItemType Directory -ErrorAction SilentlyContinue
+New-Item "$PSScriptRoot/AquaModelTool/bin/Debug" -ItemType Directory -ErrorAction SilentlyContinue
+New-Item "$PSScriptRoot/AquaModelTool/bin/Release" -ItemType Directory -ErrorAction SilentlyContinue
+New-Item "$PSScriptRoot/SoulsModelTool/bin/Debug" -ItemType Directory -ErrorAction SilentlyContinue
+New-Item "$PSScriptRoot/SoulsModelTool/bin/Release" -ItemType Directory -ErrorAction SilentlyContinue
+New-Item "$PSScriptRoot/PSO2-Aqua-Library/AquaModelTool/bin/Debug" -ItemType Directory -ErrorAction SilentlyContinue
+New-Item "$PSScriptRoot/PSO2-Aqua-Library/AquaModelTool/bin/Release" -ItemType Directory -ErrorAction SilentlyContinue
+New-Item "$PSScriptRoot/PSO2-Aqua-Library/SoulsModelTool/bin/Debug" -ItemType Directory -ErrorAction SilentlyContinue
+New-Item "$PSScriptRoot/PSO2-Aqua-Library/SoulsModelTool/bin/Release" -ItemType Directory -ErrorAction SilentlyContinue
 
 # Build PSO2-Aqua-Library
 . "$PSScriptRoot/MsBuild.ps1"
