@@ -1,4 +1,6 @@
-﻿using AquaModelLibrary;
+﻿using AquaModelLibrary.Data.PSO2.Aqua;
+using AquaModelLibrary.Data.PSO2.Aqua.CharacterMakingIndexData;
+using AquaModelLibrary.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
@@ -40,21 +42,25 @@ namespace Pso2Cli
 		{
 			binDir ??= Utility.GetPso2BinDirectory();
 
-			var cmx = CharacterMakingIndexMethods.ExtractCMX(binDir.FullName);
-
-			var parts = new Dictionary<string, SortedDictionary<int, BodyData>>
+			unsafe
 			{
-				{"basewear", GetBodyData(cmx.baseWearDict)},
-				{"outerwear", GetBodyData(cmx.outerDict)},
-				{"costume", GetBodyData(cmx.costumeDict)},
-				{"castarm", GetBodyData(cmx.carmDict)},
-				{"castleg", GetBodyData(cmx.clegDict)},
-			};
+				var cmx = new CharacterMakingIndex();
+				ReferenceGenerator.ExtractCMX(binDir.FullName, cmx);
 
-			Console.WriteLine(JsonSerializer.Serialize(parts));
+				var parts = new Dictionary<string, SortedDictionary<int, BodyData>>
+				{
+					{"basewear", GetBodyData(cmx.baseWearDict)},
+					{"outerwear", GetBodyData(cmx.outerDict)},
+					{"costume", GetBodyData(cmx.costumeDict)},
+					{"castarm", GetBodyData(cmx.carmDict)},
+					{"castleg", GetBodyData(cmx.clegDict)},
+				};
+
+				Console.WriteLine(JsonSerializer.Serialize(parts));
+			}
 		}
 
-		private static SortedDictionary<int, BodyData> GetBodyData(Dictionary<int, CharacterMakingIndex.BODYObject> parts)
+		private static SortedDictionary<int, BodyData> GetBodyData(Dictionary<int, BODYObject> parts)
 		{
 			return new SortedDictionary<int, BodyData>(
 				parts.ToDictionary(kp => kp.Key, kp =>

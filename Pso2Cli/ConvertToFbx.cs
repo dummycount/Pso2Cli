@@ -1,4 +1,4 @@
-﻿using AquaModelLibrary;
+﻿using AquaModelLibrary.Data.PSO2.Aqua;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
@@ -62,7 +62,7 @@ namespace Pso2Cli
 			switch (format)
 			{
 				case ".aqp":
-					var aqua = ConvertFromAqp(
+					var model = ConvertFromAqp(
 						source: source,
 						dest: dest,
 						skeleton: skeleton,
@@ -71,7 +71,7 @@ namespace Pso2Cli
 
 					if (printInfo)
 					{
-						PrintModelInfo(aqua);
+						PrintModelInfo(model);
 					}
 					break;
 
@@ -80,13 +80,13 @@ namespace Pso2Cli
 			}
 		}
 
-		private static void PrintModelInfo(AquaUtil aqua)
+		private static void PrintModelInfo(AquaObject aqua)
 		{
 			var info = new ModelInfo(aqua);
 			Console.WriteLine(info.ToString());
 		}
 
-		private static AquaUtil ConvertFromAqp(FileInfo source, FileInfo dest, FileInfo skeleton, FileInfo[] motion, bool includeMetadata)
+		private static AquaObject ConvertFromAqp(FileInfo source, FileInfo dest, FileInfo skeleton, FileInfo[] motion, bool includeMetadata)
 		{
 			Directory.CreateDirectory(dest.DirectoryName!);
 

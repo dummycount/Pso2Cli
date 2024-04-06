@@ -1,4 +1,4 @@
-﻿using AquaModelLibrary;
+﻿using AquaModelLibrary.Data.PSO2.Aqua;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
@@ -41,10 +41,9 @@ namespace Pso2Cli
 
 		private static void PrintAqpInfo(FileInfo inputFile)
 		{
-			var aqua = new AquaUtil();
-			aqua.ReadModel(inputFile.FullName);
+			var package = new AquaPackage(File.ReadAllBytes(inputFile.FullName));
 
-			var info = new ModelInfo(aqua);
+			var info = new ModelInfo(package);
 			Console.WriteLine(info.ToString());
 		}
 	}

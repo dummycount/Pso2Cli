@@ -1,4 +1,4 @@
-﻿using AquaModelLibrary;
+﻿using AquaModelLibrary.Data.PSO2.Aqua;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,28 +30,35 @@ namespace Pso2Cli
 
 		public ModelInfo() { }
 
-		public ModelInfo(AquaUtil aqua)
+		public ModelInfo(AquaObject model)
 		{
-			foreach (var set in aqua.aquaModels)
-			{
-				foreach (var model in set.models)
-				{
-					foreach (var material in model.GetUniqueMaterials(out var unused))
-					{
-						var matInfo = new MaterialInfo
-						{
-							Name = material.matName,
-							BlendType = material.blendType,
-							SpecialType = material.specialType,
-							TwoSided = material.twoSided,
-							AlphaCutoff = material.alphaCutoff,
-							Textures = new List<string>(material.texNames),
-							Shaders = new List<string>(material.shaderNames),
-						};
+			AddObject(model);
+		}
 
-						Materials.Add(matInfo);
-					}
-				}
+		public ModelInfo(AquaPackage package)
+		{
+			foreach (var model in package.models)
+			{
+				AddObject(model);
+			}
+		}
+
+		public void AddObject(AquaObject model)
+		{
+			foreach (var material in model.GetUniqueMaterials(out var unused))
+			{
+				var matInfo = new MaterialInfo
+				{
+					Name = material.matName,
+					BlendType = material.blendType,
+					SpecialType = material.specialType,
+					TwoSided = material.twoSided,
+					AlphaCutoff = material.alphaCutoff,
+					Textures = new List<string>(material.texNames),
+					Shaders = new List<string>(material.shaderNames),
+				};
+
+				Materials.Add(matInfo);
 			}
 		}
 

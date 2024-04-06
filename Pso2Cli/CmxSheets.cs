@@ -1,4 +1,4 @@
-﻿using AquaModelLibrary.Extra;
+﻿using AquaModelLibrary.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
@@ -35,7 +35,11 @@ namespace Pso2Cli
 			binDir ??= Utility.GetPso2BinDirectory();
 
 			Directory.CreateDirectory(outDir.FullName);
-			ReferenceGenerator.OutputFileLists(binDir.FullName, outDir.FullName);
+
+			unsafe
+			{
+				ReferenceGenerator.OutputFileLists(binDir.FullName, outDir.FullName);
+			}
 		}
 	}
 }

@@ -1,4 +1,6 @@
-﻿using AquaModelLibrary;
+﻿using AquaModelLibrary.Data.PSO2.Aqua;
+using AquaModelLibrary.Data.PSO2.Aqua.CharacterMakingIndexData;
+using AquaModelLibrary.Data.Utility;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
@@ -6,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using static AquaModelLibrary.CharacterMakingIndex;
 
 namespace Pso2Cli
 {
@@ -29,22 +30,26 @@ namespace Pso2Cli
 		{
 			binDir ??= Utility.GetPso2BinDirectory();
 
-			var cmx = CharacterMakingIndexMethods.ExtractCMX(binDir.FullName);
-
-			var parts = new Dictionary<string, SortedDictionary<int, CharColorMapping[]>>
+			unsafe
 			{
-				{"basewear", GetColorChannels(cmx.baseWearDict)},
-				{"outerwear", GetColorChannels(cmx.outerDict)},
-				{"costume", GetColorChannels(cmx.costumeDict)},
-				{"castarm", GetColorChannels(cmx.carmDict)},
-				{"castleg", GetColorChannels(cmx.clegDict)},
-				{"hair", GetColorChannels(cmx.hairDict)},
-			};
+				var cmx = new CharacterMakingIndex();
+				ReferenceGenerator.ExtractCMX(binDir.FullName, cmx);
 
-			Console.WriteLine(JsonSerializer.Serialize(parts));
+				var parts = new Dictionary<string, SortedDictionary<int, CharColorMapping[]>>
+				{
+					{"basewear", GetColorChannels(cmx.baseWearDict)},
+					{"outerwear", GetColorChannels(cmx.outerDict)},
+					{"costume", GetColorChannels(cmx.costumeDict)},
+					{"castarm", GetColorChannels(cmx.carmDict)},
+					{"castleg", GetColorChannels(cmx.clegDict)},
+					{"hair", GetColorChannels(cmx.hairDict)},
+				};
+
+				Console.WriteLine(JsonSerializer.Serialize(parts));
+			}
 		}
 
-		private static SortedDictionary<int, CharColorMapping[]> GetColorChannels(Dictionary<int, CharacterMakingIndex.BODYObject> parts)
+		private static SortedDictionary<int, CharColorMapping[]> GetColorChannels(Dictionary<int, BODYObject> parts)
 		{
 			return new SortedDictionary<int, CharColorMapping[]>(
 				parts.ToDictionary(kp => kp.Key, kp => new CharColorMapping[]
@@ -57,7 +62,7 @@ namespace Pso2Cli
 			);
 		}
 
-		private static SortedDictionary<int, CharColorMapping[]> GetColorChannels(Dictionary<int, CharacterMakingIndex.HAIRObject> parts)
+		private static SortedDictionary<int, CharColorMapping[]> GetColorChannels(Dictionary<int, HAIRObject> parts)
 		{
 			return new SortedDictionary<int, CharColorMapping[]>(
 				parts.Where(kp => kp.Key >= 100000).ToDictionary(kp => kp.Key, kp =>

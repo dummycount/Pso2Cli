@@ -1,6 +1,5 @@
-﻿using AquaModelLibrary;
-using AquaModelLibrary.Native.Fbx;
-using AquaModelLibrary.Utility;
+﻿using AquaModelLibrary.Core.General;
+using AquaModelLibrary.Data.PSO2.Aqua;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,20 +12,21 @@ namespace Pso2Cli
 {
 	public class Fbx
 	{
+		const double BlenderScale = 100;
+
 		/// <summary>
 		/// Read an FBX file and return a PSO2 Aqua model.
 		/// </summary>
 		/// <param name="fbxFile"></param>
 		/// <returns></returns>
-		public static AquaUtil Import(FileInfo fbxFile)
+		public static (AquaObject model, AquaNode skeleton) Import(FileInfo fbxFile)
 		{
-			var aqua = new AquaUtil();
-			var modelSet = new AquaUtilData.ModelSet();
-			modelSet.models.Add(ModelImporter.AssimpAquaConvertFull(fbxFile.FullName, scaleFactor: 1, preAssignNodeIds: false, isNGS: true, out var aqn));
-			aqua.aquaModels.Add(modelSet);
-			aqua.aquaBones.Add(aqn);
+			AssimpModelImporter.scaleHandling = AssimpModelImporter.ScaleHandling.CustomScale;
+			AssimpModelImporter.customScale = BlenderScale;
 
-			return aqua;
+			var aqp = AssimpModelImporter.AssimpAquaConvertFull(fbxFile.FullName, scaleFactor: 1, preAssignNodeIds: false, isNGS: true, out AquaNode aqn);
+
+			return (aqp, aqn);
 		}
 
 		/// <summary>
@@ -37,13 +37,13 @@ namespace Pso2Cli
 		/// <param name="skeletonFile">Optional: AQN file to write</param>
 		public static void ConvertToAqua(FileInfo fbxFile, FileInfo aqpFile, FileInfo? skeletonFile = null)
 		{
-			var aqua = Import(fbxFile);
+			var (model, skeleton) = Import(fbxFile);
 
-			aqua.WriteNGSNIFLModel(aqpFile.FullName, aqpFile.FullName);
+			File.WriteAllBytes(aqpFile.FullName, model.GetBytesNIFL());
 
 			if (skeletonFile != null)
 			{
-				AquaUtil.WriteBones(skeletonFile.FullName, aqua.aquaBones.First());
+				File.WriteAllBytes(skeletonFile.FullName, skeleton.GetBytesNIFL());
 			}
 		}
 
@@ -60,25 +60,23 @@ namespace Pso2Cli
 		/// <param name="fbxFile"></param>
 		/// <param name="includeMetadata"></param>
 		/// <param name="motions"></param>
-		public static void Export(AquaUtil aqua, FileInfo fbxFile, bool includeMetadata = true, IEnumerable<MotionExport>? motions = null)
+		public static void Export(AquaObject model, AquaNode? skeleton, FileInfo fbxFile, bool includeMetadata = true, IEnumerable<MotionExport>? motions = null)
 		{
-			if (aqua.aquaBones.Count == 0)
-			{
-				aqua.aquaBones.Add(AquaNode.GenerateBasicAQN());
-			}
+			skeleton ??= AquaNode.GenerateBasicAQN();
 
-			RemoveInvalidBones(aqua);
+			RemoveInvalidBones(model, skeleton);
 
 			var aqms = motions?.Select(m => m.Motion).ToList() ?? [];
 			var aqmNames = motions?.Select(m => m.Name).ToList() ?? [];
 
-			var model = aqua.aquaModels.First().models.First();
 			if (model.objc.type > 0xC32)
 			{
 				model.splitVSETPerMesh();
 			}
 
-			FbxExporter.ExportToFile(model, aqua.aquaBones.First(), aqms, fbxFile.FullName, aqmNames, [], includeMetadata);
+			model.FixHollowMatNaming();
+
+			FbxExporterNative.ExportToFile(model, skeleton, aqms, fbxFile.FullName, aqmNames, [], includeMetadata);
 		}
 
 		/// <summary>
@@ -89,57 +87,28 @@ namespace Pso2Cli
 		/// <param name="skeletonFile">.aqn file to read</param>
 		/// <param name="motionFiles">List of .aqm files to read</param>
 		/// <param name="includeMetadata"></param>
-		public static AquaUtil ConvertFromAqua(FileInfo aqpFile, FileInfo fbxFile, FileInfo? skeletonFile = null, bool includeMetadata = true, IEnumerable<FileInfo>? motionFiles = null)
+		public static AquaObject ConvertFromAqua(FileInfo aqpFile, FileInfo fbxFile, FileInfo? skeletonFile = null, bool includeMetadata = true, IEnumerable<FileInfo>? motionFiles = null)
 		{
-			var model = File.ReadAllBytes(aqpFile.FullName);
-			var skeleton = skeletonFile != null ? File.ReadAllBytes(skeletonFile.FullName) : null;
-			return ConvertFromAqua(fbxFile, model, skeleton, includeMetadata, motionFiles);
+			var package = new AquaPackage(File.ReadAllBytes(aqpFile.FullName));
+			var model = package.models[0];
+
+			// var model = new AquaObject(File.ReadAllBytes(aqpFile.FullName));
+			var skeleton = skeletonFile != null ? new AquaNode(File.ReadAllBytes(skeletonFile.FullName)) : null;
+
+			var motions = motionFiles?.Select(f => new MotionExport 
+			{ 
+				Name = f.FullName, 
+				Motion = new AquaMotion(File.ReadAllBytes(f.FullName)) 
+			});
+
+			Export(model, skeleton, fbxFile, includeMetadata, motions);
+
+			return model;
 		}
 
-		/// <summary>
-		/// Convert a PSO2 Aqua model to the FBX format.
-		/// </summary>
-		/// <param name="fbxFile">File to write</param>
-		/// <param name="modelFile">.aqp file to read</param>
-		/// <param name="skeletonFile">.aqn file to read</param>
-		/// <param name="motionFiles">List of .aqm files to read</param>
-		/// <param name="includeMetadata"></param>
-		public static AquaUtil ConvertFromAqua(FileInfo fbxFile, byte[] modelFile, byte[]? skeletonFile = null, bool includeMetadata = true, IEnumerable<FileInfo>? motionFiles = null)
+		private static void RemoveInvalidBones(AquaObject model, AquaNode skeleton)
 		{
-			var aqua = new AquaUtil();
-			var aqms = new List<AquaMotion>();
-			var aqmFileNames = new List<string>();
-
-			aqua.ReadModel(modelFile);
-
-			if (skeletonFile != null)
-			{
-				aqua.ReadBones(skeletonFile);
-			}
-
-			var motions = motionFiles?.Select(f => new MotionExport { Name = f.FullName, Motion = ReadMotion(f) });
-
-			Export(aqua, fbxFile, includeMetadata, motions);
-
-			return aqua;
-		}
-
-		private static AquaMotion ReadMotion(FileInfo file)
-		{
-			var aqm = new AquaUtil();
-			aqm.ReadMotion(file.FullName);
-			return aqm.aquaMotions.First().anims.First();
-		}
-
-		private static void RemoveInvalidBones(AquaUtil aqua)
-		{
-			foreach (var modelset in aqua.aquaModels)
-			{
-				foreach (var model in modelset.models)
-				{
-					RemoveInvalidBones(model, aqua.aquaBones[0].nodeList.Count);
-				}
-			}
+			RemoveInvalidBones(model, skeleton.nodeList.Count);
 		}
 
 		private static void RemoveInvalidBones(AquaObject model, int boneCount)

@@ -1,12 +1,10 @@
-﻿using AquaModelLibrary;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using static AquaModelLibrary.CharacterMakingIndex;
 
 namespace Pso2Cli
 {

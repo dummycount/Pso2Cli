@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>pso</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,14 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PSO2-Aqua-Library\AquaModelLibrary\AquaModelLibrary.csproj" />
+    <ProjectReference Include="..\PSO2-Aqua-Library\AquaModelLibrary.Core\AquaModelLibrary.Core.csproj" />
+    <ProjectReference Include="..\PSO2-Aqua-Library\AquaModelLibrary.Data\AquaModelLibrary.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="../PSO2-Aqua-Library/AquaModelLibrary.Native/bin/$(Configuration)/AquaModelLibrary.Native.X64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="../PSO2-Aqua-Library/ZamboniLib/ooz-sys/$(Configuration)/ooz.x64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -3,9 +3,12 @@ param (
 	[switch] $Archive
 )
 
-$target = if ($Clean) { '-t:Rebuild' } else { '-t:Build' }
+function Get-MsBuild {
+	$vs = ConvertFrom-Json $(&'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe' -latest -format json | Out-String)
+	return Join-Path $vs.installationPath 'Msbuild/Current/Bin/MSBuild.exe'
+}
 
-. "$PSScriptRoot/MsBuild.ps1"
+$target = if ($Clean) { '-t:Rebuild' } else { '-t:Build' }
 $msBuild = Get-MsBuild
 
 & "$PSScriptRoot/SetupDependencies.ps1" -ReleaseOnly

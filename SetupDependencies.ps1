@@ -24,27 +24,3 @@ if (!(Test-Path $fbxTarget)) {
 
 New-Junction -Path "$fbxPath/lib" -Target "$fbxTarget/lib"
 New-Junction -Path "$fbxPath/include" -Target "$fbxTarget/include"
-
-# Silence meaningless errors from PSO2-Aqua-Library build
-New-Item "$PSScriptRoot/AquaModelTool/bin/Debug" -ItemType Directory -ErrorAction SilentlyContinue
-New-Item "$PSScriptRoot/AquaModelTool/bin/Release" -ItemType Directory -ErrorAction SilentlyContinue
-New-Item "$PSScriptRoot/SoulsModelTool/bin/Debug" -ItemType Directory -ErrorAction SilentlyContinue
-New-Item "$PSScriptRoot/SoulsModelTool/bin/Release" -ItemType Directory -ErrorAction SilentlyContinue
-New-Item "$PSScriptRoot/PSO2-Aqua-Library/AquaModelTool/bin/Debug" -ItemType Directory -ErrorAction SilentlyContinue
-New-Item "$PSScriptRoot/PSO2-Aqua-Library/AquaModelTool/bin/Release" -ItemType Directory -ErrorAction SilentlyContinue
-New-Item "$PSScriptRoot/PSO2-Aqua-Library/SoulsModelTool/bin/Debug" -ItemType Directory -ErrorAction SilentlyContinue
-New-Item "$PSScriptRoot/PSO2-Aqua-Library/SoulsModelTool/bin/Release" -ItemType Directory -ErrorAction SilentlyContinue
-
-# Build PSO2-Aqua-Library
-. "$PSScriptRoot/MsBuild.ps1"
-$msBuild = Get-MsBuild
-
-if (!$ReleaseOnly) {
-    & $msBuild "$PSScriptRoot/PSO2-Aqua-Library/ZamboniLib/Zamboni.sln" -p:RestorePackagesConfig=true -p:Configuration=Debug -p:Platform=x86 -verbosity:minimal -restore
-    & $msBuild "$PSScriptRoot/PSO2-Aqua-Library/ZamboniLib/Zamboni.sln" -p:RestorePackagesConfig=true -p:Configuration=Debug -p:Platform=x64 -verbosity:minimal -restore
-    & $msBuild "$PSScriptRoot/PSO2-Aqua-Library/AquaModelLibrary.sln" -p:RestorePackagesConfig=true -p:Configuration=Debug -verbosity:minimal -restore
-}
-
-& $msBuild "$PSScriptRoot/PSO2-Aqua-Library/ZamboniLib/Zamboni.sln" -p:RestorePackagesConfig=true -p:Configuration=Release -p:Platform=x86 -verbosity:minimal -restore
-& $msBuild "$PSScriptRoot/PSO2-Aqua-Library/ZamboniLib/Zamboni.sln" -p:RestorePackagesConfig=true -p:Configuration=Release -p:Platform=x64 -verbosity:minimal -restore
-& $msBuild "$PSScriptRoot/PSO2-Aqua-Library/AquaModelLibrary.sln" -p:RestorePackagesConfig=true -p:Configuration=Release -verbosity:minimal -restore
