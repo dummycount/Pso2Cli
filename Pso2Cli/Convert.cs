@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.CommandLine;
 
-namespace Pso2Cli
+namespace Pso2Cli;
+
+static internal class Convert
 {
-	static internal class Convert
+	public static Command Command()
 	{
-		public static Command Command()
+		return new Command(name: "convert", description: "Convert between file formats")
 		{
-			return new Command(name: "convert", description: "Convert between file formats")
-			{
-				ConvertToAqp.Command(),
-				ConvertToFbx.Command(),
-				ConvertToPng.Command(),
-			};
-		}
+			ConvertToAqp.Command(),
+			ConvertToFbx.Command(),
+			ConvertToPng.Command(),
+		};
 	}
 }

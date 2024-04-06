@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.CommandLine;
 
-namespace Pso2Cli
+namespace Pso2Cli;
+
+internal class Ice
 {
-	internal class Ice
-	{
-		public const string ExtractedSuffix = ".extracted";
+	public const string ExtractedSuffix = ".extracted";
 
-		public static Command Command()
+	public static Command Command()
+	{
+		return new Command(name: "ice", description: "ICE archive commands")
 		{
-			return new Command(name: "ice", description: "ICE archive commands")
-			{
-				IceList.Command(),
-				IcePack.Command(),
-				IceUnpack.Command(),
-			};
-		}
+			IceList.Command(),
+			IcePack.Command(),
+			IceUnpack.Command(),
+		};
 	}
 }

@@ -1,76 +1,70 @@
 ﻿using AquaModelLibrary.Data.PSO2.Aqua;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace Pso2Cli
+namespace Pso2Cli;
+
+internal class ModelInfo
 {
-	internal class ModelInfo
+	public class MaterialInfo : IComparable<MaterialInfo>
 	{
-		public class MaterialInfo : IComparable<MaterialInfo>
+		public string Name { get; set; } = "";
+		public string BlendType { get; set; } = "";
+		public string SpecialType { get; set; } = "";
+		public int TwoSided { get; set; }
+		public int AlphaCutoff { get; set; }
+		public List<string> Textures { get; set; } = [];
+		public List<string> Shaders { get; set; } = [];
+
+		public int CompareTo(MaterialInfo? other)
 		{
-			public string Name { get; set; } = "";
-			public string BlendType { get; set; } = "";
-			public string SpecialType { get; set; } = "";
-			public int TwoSided { get; set; }
-			public int AlphaCutoff { get; set; }
-			public List<string> Textures { get; set; } = [];
-			public List<string> Shaders { get; set; } = [];
-
-			public int CompareTo(MaterialInfo? other)
-			{
-				return Name.CompareTo(other?.Name);
-			}
+			return Name.CompareTo(other?.Name);
 		}
+	}
 
-		public SortedSet<MaterialInfo> Materials { get; set; } = [];
+	public SortedSet<MaterialInfo> Materials { get; set; } = [];
 
-		public ModelInfo() { }
+	public ModelInfo() { }
 
-		public ModelInfo(AquaObject model)
+	public ModelInfo(AquaObject model)
+	{
+		AddObject(model);
+	}
+
+	public ModelInfo(AquaPackage package)
+	{
+		foreach (var model in package.models)
 		{
 			AddObject(model);
 		}
+	}
 
-		public ModelInfo(AquaPackage package)
+	public void AddObject(AquaObject model)
+	{
+		foreach (var material in model.GetUniqueMaterials(out var unused))
 		{
-			foreach (var model in package.models)
+			var matInfo = new MaterialInfo
 			{
-				AddObject(model);
-			}
+				Name = material.matName,
+				BlendType = material.blendType,
+				SpecialType = material.specialType,
+				TwoSided = material.twoSided,
+				AlphaCutoff = material.alphaCutoff,
+				Textures = new List<string>(material.texNames),
+				Shaders = new List<string>(material.shaderNames),
+			};
+
+			Materials.Add(matInfo);
 		}
+	}
 
-		public void AddObject(AquaObject model)
-		{
-			foreach (var material in model.GetUniqueMaterials(out var unused))
-			{
-				var matInfo = new MaterialInfo
-				{
-					Name = material.matName,
-					BlendType = material.blendType,
-					SpecialType = material.specialType,
-					TwoSided = material.twoSided,
-					AlphaCutoff = material.alphaCutoff,
-					Textures = new List<string>(material.texNames),
-					Shaders = new List<string>(material.shaderNames),
-				};
+	private static readonly JsonSerializerOptions JsonOptions = new()
+	{
+		PropertyNamingPolicy = new LowerCaseJsonNamingPolicy(),
+		WriteIndented = true
+	};
 
-				Materials.Add(matInfo);
-			}
-		}
-
-		private static readonly JsonSerializerOptions JsonOptions = new()
-		{
-			PropertyNamingPolicy = new LowerCaseJsonNamingPolicy(),
-			WriteIndented = true
-		};
-
-		public override string ToString()
-		{
-			return JsonSerializer.Serialize(this, JsonOptions);
-		}
+	public override string ToString()
+	{
+		return JsonSerializer.Serialize(this, JsonOptions);
 	}
 }

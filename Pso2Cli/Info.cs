@@ -1,50 +1,44 @@
 ﻿using AquaModelLibrary.Data.PSO2.Aqua;
-using System;
-using System.Collections.Generic;
 using System.CommandLine;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Pso2Cli
+namespace Pso2Cli;
+
+internal static class Info
 {
-	internal static class Info
+	public static Command Command()
 	{
-		public static Command Command()
+		var fileArg = new Argument<FileInfo>(name: "file", description: "Item to inspect")
+			.ExistingOnly();
+
+		var command = new Command(name: "info", description: "Print file information")
 		{
-			var fileArg = new Argument<FileInfo>(name: "file", description: "Item to inspect")
-				.ExistingOnly();
+			fileArg,
+		};
 
-			var command = new Command(name: "info", description: "Print file information")
-			{
-				fileArg,
-			};
+		command.SetHandler(Handler, fileArg);
 
-			command.SetHandler(Handler, fileArg);
+		return command;
+	}
 
-			return command;
-		}
-
-		private static void Handler(FileInfo inputFile)
+	private static void Handler(FileInfo inputFile)
+	{
+		var format = Path.GetExtension(inputFile.FullName).ToLower();
+		switch (format)
 		{
-			var format = Path.GetExtension(inputFile.FullName).ToLower();
-			switch (format)
-			{
-				case ".aqp":
-					PrintAqpInfo(inputFile);
-					break;
+			case ".aqp":
+				PrintAqpInfo(inputFile);
+				break;
 
-				default:
-					throw new ArgumentException($"Unsupported format: {format}");
-			}
+			default:
+				throw new ArgumentException($"Unsupported format: {format}");
 		}
+	}
 
-		private static void PrintAqpInfo(FileInfo inputFile)
-		{
-			var package = new AquaPackage(File.ReadAllBytes(inputFile.FullName));
+	private static void PrintAqpInfo(FileInfo inputFile)
+	{
+		var package = new AquaPackage(File.ReadAllBytes(inputFile.FullName));
 
-			var info = new ModelInfo(package);
-			Console.WriteLine(info.ToString());
-		}
+		var info = new ModelInfo(package);
+		Console.WriteLine(info.ToString());
 	}
 }

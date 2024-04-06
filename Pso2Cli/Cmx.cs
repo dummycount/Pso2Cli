@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.CommandLine;
 
-namespace Pso2Cli
+namespace Pso2Cli;
+
+internal static class Cmx
 {
-	internal static class Cmx
+	public static Command Command()
 	{
-		public static Command Command()
+		return new Command(name: "cmx", description: "CMX data commands")
 		{
-			return new Command(name: "cmx", description: "CMX data commands")
-			{
-				CmxBodyMetadata.Command(),
-				CmxColorChannels.Command(),
-				CmxSheets.Command(),
-			};
-		}
+			CmxBodyMetadata.Command(),
+			CmxColorChannels.Command(),
+			CmxSheets.Command(),
+		};
 	}
 }

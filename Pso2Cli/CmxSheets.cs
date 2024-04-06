@@ -1,45 +1,39 @@
 ﻿using AquaModelLibrary.Data.Utility;
-using System;
-using System.Collections.Generic;
 using System.CommandLine;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Pso2Cli
+namespace Pso2Cli;
+
+internal static class CmxSheets
 {
-	internal static class CmxSheets
+	public static Command Command()
 	{
-		public static Command Command()
+		var binDirOption = Utility.GetPso2BinDirectoryOption(); ;
+
+		var outArg = new Argument<DirectoryInfo>(
+			name: "out",
+			description: "Output directory",
+			getDefaultValue: () => new DirectoryInfo("./FileList"));
+
+		var command = new Command(name: "sheets", description: "Generate file list spreadsheets")
 		{
-			var binDirOption = Utility.GetPso2BinDirectoryOption(); ;
+			binDirOption,
+			outArg,
+		};
 
-			var outArg = new Argument<DirectoryInfo>(
-				name: "out",
-				description: "Output directory",
-				getDefaultValue: () => new DirectoryInfo("./FileList"));
+		command.SetHandler(Handler, binDirOption, outArg);
 
-			var command = new Command(name: "sheets", description: "Generate file list spreadsheets")
-			{
-				binDirOption,
-				outArg,
-			};
+		return command;
+	}
 
-			command.SetHandler(Handler, binDirOption, outArg);
+	private static void Handler(DirectoryInfo? binDir, DirectoryInfo outDir)
+	{
+		binDir ??= Utility.GetPso2BinDirectory();
 
-			return command;
-		}
+		Directory.CreateDirectory(outDir.FullName);
 
-		private static void Handler(DirectoryInfo? binDir, DirectoryInfo outDir)
+		unsafe
 		{
-			binDir ??= Utility.GetPso2BinDirectory();
-
-			Directory.CreateDirectory(outDir.FullName);
-
-			unsafe
-			{
-				ReferenceGenerator.OutputFileLists(binDir.FullName, outDir.FullName);
-			}
+			ReferenceGenerator.OutputFileLists(binDir.FullName, outDir.FullName);
 		}
 	}
 }

@@ -1,99 +1,93 @@
 ﻿using Pfim;
-using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
-namespace Pso2Cli
+namespace Pso2Cli;
+
+static internal class ConvertToPng
 {
-	static internal class ConvertToPng
+	public static Command Command()
 	{
-		public static Command Command()
+		var sourceArg = new Argument<FileInfo>(name: "file", description: "Image to convert")
+			.ExistingOnly();
+
+		var destArg = new Argument<FileInfo>(name: "dest", description: "Converted file [default: <file>.png]")
 		{
-			var sourceArg = new Argument<FileInfo>(name: "file", description: "Image to convert")
-				.ExistingOnly();
+			Arity = ArgumentArity.ZeroOrOne
+		};
 
-			var destArg = new Argument<FileInfo>(name: "dest", description: "Converted file [default: <file>.png]")
-			{
-				Arity = ArgumentArity.ZeroOrOne
-			};
+		var command = new Command(name: "png", description: "Convert images to PNG")
+		{
+			sourceArg,
+			destArg,
+		};
 
-			var command = new Command(name: "png", description: "Convert images to PNG")
-			{
-				sourceArg,
-				destArg,
-			};
+		command.SetHandler(Handler, sourceArg, destArg);
 
-			command.SetHandler(Handler, sourceArg, destArg);
+		return command;
+	}
 
-			return command;
+	private static void Handler(FileInfo source, FileInfo? dest)
+	{
+		dest ??= new FileInfo(Path.ChangeExtension(source.FullName, ".png"));
+
+		if (dest.FullName == source.FullName)
+		{
+			throw new ArgumentException("Source and destination cannot be the same file");
 		}
 
-		private static void Handler(FileInfo source, FileInfo? dest)
+		var sourceFormat = Path.GetExtension(source.FullName).ToLower();
+		switch (sourceFormat)
 		{
-			dest ??= new FileInfo(Path.ChangeExtension(source.FullName, ".png"));
+			case ".dds":
+				ConvertDds(source, dest);
+				break;
 
-			if (dest.FullName == source.FullName)
-			{
-				throw new ArgumentException("Source and destination cannot be the same file");
-			}
+			default:
+				throw new ArgumentException($"Unsupported format: {sourceFormat}");
+		}
+	}
 
-			var sourceFormat = Path.GetExtension(source.FullName).ToLower();
-			switch (sourceFormat)
-			{
-				case ".dds":
-					ConvertDds(source, dest);
-					break;
+	private static void ConvertDds(FileInfo source, FileInfo dest)
+	{
+		using var image = Pfimage.FromFile(source.FullName);
 
-				default:
-					throw new ArgumentException($"Unsupported format: {sourceFormat}");
-			}
+		var data = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
+		var bitmap = new Bitmap(image.Width, image.Height, image.Stride, GetPixelFormat(image), data);
+
+		if (image.Format == Pfim.ImageFormat.Rgb8)
+		{
+			SetGrayscaleColorPalette(bitmap);
 		}
 
-		private static void ConvertDds(FileInfo source, FileInfo dest)
+		Directory.CreateDirectory(dest.DirectoryName!);
+		bitmap.Save(dest.FullName, ImageFormat.Png);
+	}
+
+	private static PixelFormat GetPixelFormat(IImage image)
+	{
+		return image.Format switch
 		{
-			using var image = Pfimage.FromFile(source.FullName);
+			Pfim.ImageFormat.Rgb24 => PixelFormat.Format24bppRgb,
+			Pfim.ImageFormat.Rgba32 => PixelFormat.Format32bppArgb,
+			Pfim.ImageFormat.R5g5b5 => PixelFormat.Format16bppRgb555,
+			Pfim.ImageFormat.R5g6b5 => PixelFormat.Format16bppRgb565,
+			Pfim.ImageFormat.R5g5b5a1 => PixelFormat.Format16bppArgb1555,
+			Pfim.ImageFormat.Rgb8 => PixelFormat.Format8bppIndexed,
+			_ => throw new NotImplementedException($"Unsupported image format: {image.Format}"),
+		};
+	}
 
-			var data = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
-			var bitmap = new Bitmap(image.Width, image.Height, image.Stride, GetPixelFormat(image), data);
-
-			if (image.Format == Pfim.ImageFormat.Rgb8)
-			{
-				SetGrayscaleColorPalette(bitmap);
-			}
-
-			Directory.CreateDirectory(dest.DirectoryName!);
-			bitmap.Save(dest.FullName, ImageFormat.Png);
-		}
-
-		private static PixelFormat GetPixelFormat(IImage image)
+	private static void SetGrayscaleColorPalette(Bitmap bitmap)
+	{
+		var palette = bitmap.Palette;
+		for (var i = 0; i < palette.Entries.Length; i++)
 		{
-			return image.Format switch
-			{
-				Pfim.ImageFormat.Rgb24 => PixelFormat.Format24bppRgb,
-				Pfim.ImageFormat.Rgba32 => PixelFormat.Format32bppArgb,
-				Pfim.ImageFormat.R5g5b5 => PixelFormat.Format16bppRgb555,
-				Pfim.ImageFormat.R5g6b5 => PixelFormat.Format16bppRgb565,
-				Pfim.ImageFormat.R5g5b5a1 => PixelFormat.Format16bppArgb1555,
-				Pfim.ImageFormat.Rgb8 => PixelFormat.Format8bppIndexed,
-				_ => throw new NotImplementedException($"Unsupported image format: {image.Format}"),
-			};
+			palette.Entries[i] = Color.FromArgb(i, i, i);
 		}
-
-		private static void SetGrayscaleColorPalette(Bitmap bitmap)
-		{
-			var palette = bitmap.Palette;
-			for (var i = 0; i < palette.Entries.Length; i++)
-			{
-				palette.Entries[i] = Color.FromArgb(i, i, i);
-			}
-			bitmap.Palette = palette;
-		}
+		bitmap.Palette = palette;
 	}
 }
