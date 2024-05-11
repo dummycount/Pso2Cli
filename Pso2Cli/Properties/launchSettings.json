@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Pso2Cli": {
-      "commandName": "Project",
-      "commandLineArgs": "convert fbx \"D:\\PSO2 Tools\\Models\\pl_rbd_201980_bw.aqp\""
-    }
-  }
-}
