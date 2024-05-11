@@ -22,20 +22,49 @@ static internal class ConvertToAqp
 			aliases: ["--update-aqn", "-u"], 
 			description: "Overwrite existing .aqn file if --skeleton not specified");
 
+		var scaleOption = new Option<Fbx.IScaleValue>(
+			aliases: ["--scale", "-x"],
+			parseArgument: (result) =>
+			{
+				if (!result.Tokens.Any())
+				{
+					return Fbx.DefaultScale;
+				}
+
+				var token = result.Tokens.Single().Value.ToLower();
+				if (token == "none")
+				{
+					return new Fbx.NoScale();
+				}
+				if (token == "file")
+				{
+					return new Fbx.FileScale();
+				}
+				if (double.TryParse(token, out var scale))
+				{
+					return new Fbx.CustomScale(scale);
+				}
+
+				result.ErrorMessage = "Scale must be a number, \"file\" or \"none\".";
+				return Fbx.DefaultScale;
+			},
+			description: "Scale multiplier, \"file\", or \"none\" [default: file]");
+
 		var command = new Command(name: "aqp", description: "Convert models to AQP")
 		{
 			sourceArg,
 			destArg,
 			aqnArg,
 			updateAqnOption,
+			scaleOption,
 		};
 
-		command.SetHandler(Handler, sourceArg, destArg, aqnArg, updateAqnOption);
+		command.SetHandler(Handler, sourceArg, destArg, aqnArg, updateAqnOption, scaleOption);
 
 		return command;
 	}
 
-	private static void Handler(FileInfo source, FileInfo? dest, FileInfo? aqn, bool updateAqn)
+	private static void Handler(FileInfo source, FileInfo? dest, FileInfo? aqn, bool updateAqn, Fbx.IScaleValue scale)
 	{
 		dest ??= new FileInfo(Path.ChangeExtension(source.FullName, ".aqp"));
 
@@ -53,7 +82,7 @@ static internal class ConvertToAqp
 		{
 			case ".fbx":
 				Directory.CreateDirectory(dest.DirectoryName!);
-				Fbx.ConvertToAqua(fbxFile: source, aqpFile: dest, skeletonFile: aqn);
+				Fbx.ConvertToAqua(fbxFile: source, aqpFile: dest, skeletonFile: aqn, scale: scale);
 				break;
 
 			default:

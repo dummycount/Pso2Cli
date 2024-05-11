@@ -5,17 +5,43 @@ namespace Pso2Cli;
 
 public class Fbx
 {
-	const double BlenderScale = 100;
+	public interface IScaleValue
+	{
+		AssimpModelImporter.ScaleHandling ScaleHandling { get; }
+		double CustomScale { get; }
+	}
+
+	public class NoScale : IScaleValue
+	{
+		public AssimpModelImporter.ScaleHandling ScaleHandling => AssimpModelImporter.ScaleHandling.NoScaling;
+		public double CustomScale => 1;
+	}
+
+	public class FileScale : IScaleValue
+	{
+		public AssimpModelImporter.ScaleHandling ScaleHandling => AssimpModelImporter.ScaleHandling.FileScaling;
+		public double CustomScale => 1;
+	}
+
+	public class CustomScale(double value) : IScaleValue
+	{
+		public AssimpModelImporter.ScaleHandling ScaleHandling => AssimpModelImporter.ScaleHandling.CustomScale;
+		double IScaleValue.CustomScale => value;
+	}
+
+	public static readonly IScaleValue DefaultScale = new FileScale();
 
 	/// <summary>
 	/// Read an FBX file and return a PSO2 Aqua model.
 	/// </summary>
 	/// <param name="fbxFile"></param>
 	/// <returns></returns>
-	public static (AquaObject model, AquaNode skeleton) Import(FileInfo fbxFile)
+	public static (AquaObject model, AquaNode skeleton) Import(FileInfo fbxFile, IScaleValue? scale = null)
 	{
-		AssimpModelImporter.scaleHandling = AssimpModelImporter.ScaleHandling.CustomScale;
-		AssimpModelImporter.customScale = BlenderScale;
+		scale ??= DefaultScale;
+
+		AssimpModelImporter.scaleHandling = scale.ScaleHandling;
+		AssimpModelImporter.customScale = scale.CustomScale;
 
 		var aqp = AssimpModelImporter.AssimpAquaConvertFull(fbxFile.FullName, scaleFactor: 1, preAssignNodeIds: false, isNGS: true, out AquaNode aqn);
 
@@ -28,9 +54,9 @@ public class Fbx
 	/// <param name="fbxFile">FBX file to read</param>
 	/// <param name="aqpFile">AQP file to write</param>
 	/// <param name="skeletonFile">Optional: AQN file to write</param>
-	public static void ConvertToAqua(FileInfo fbxFile, FileInfo aqpFile, FileInfo? skeletonFile = null)
+	public static void ConvertToAqua(FileInfo fbxFile, FileInfo aqpFile, FileInfo? skeletonFile = null, IScaleValue? scale = null)
 	{
-		var (model, skeleton) = Import(fbxFile);
+		var (model, skeleton) = Import(fbxFile, scale);
 
 		var package = new AquaPackage(model);
 		package.WritePackage(aqpFile.FullName);
