@@ -32,7 +32,8 @@ public class Fbx
 	{
 		var (model, skeleton) = Import(fbxFile);
 
-		File.WriteAllBytes(aqpFile.FullName, model.GetBytesNIFL());
+		var package = new AquaPackage(model);
+		package.WritePackage(aqpFile.FullName);
 
 		if (skeletonFile != null)
 		{
